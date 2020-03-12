@@ -9,8 +9,8 @@ class Common extends MY_Controller {
 		$this->load->model('global_model');
 		date_default_timezone_set('Asia/Calcutta'); 
 		if($this->_is_logged_in('admin_id')){
-            _redirect('admin_home');
-        }
+		    _redirect('admin_home');
+		}
 	}
 
 # User Registration
