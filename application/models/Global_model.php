@@ -37,6 +37,18 @@ Class Global_model extends CI_Model {
         return $q->result_array();
     }
 
+    public function get_all($table, $where = array()){
+        $q = $this->db->get($table);
+        return $q->result_array();
+    }
+
+    public function order_by($table,$field,$order_by){
+       $q = $this->db->from($table)
+                ->order_by($field,$order_by)
+                ->get();
+        return $q->result_array();
+    }
+
     public function search($table, $where = array(), $like = array(), $or_where = array(), $or_like = array(), $limit = False, $offset = False) {
         $q = $this->db
                 ->where($where)
@@ -77,14 +89,50 @@ Class Global_model extends CI_Model {
         return $q->result_array();
     }
 
-public function join_table3($school_id){
-    $this->db->select ( '*' ); 
-    $this->db->from ( 'complaint' );
-    $this->db->join ( 'student', 'student.student_id= complaint.student_id' , 'left' );
-    $this->db->where ( 'complaint.school_id', $school_id);
-    $this->db->order_by('id','desc');
-    $query = $this->db->get ();
-    return $query->result_array();
-}
+    public function join_table3($school_id){
+        $this->db->select ( '*' ); 
+        $this->db->from ( 'complaint' );
+        $this->db->join ( 'student', 'student.student_id= complaint.student_id' , 'left' );
+        $this->db->where ( 'complaint.school_id', $school_id);
+        $this->db->order_by('id','desc');
+        $query = $this->db->get ();
+        return $query->result_array();
+    }
+
+    public function google_login($data = array()){
+        $this->db->select('id');
+        $this->db->from("google");
+        
+        $con = array(
+            'oauth_provider' => $data['oauth_provider'],
+            'oauth_uid' => $data['oauth_uid']
+        );
+        $this->db->where($con);
+        $query = $this->db->get();
+        
+        $check = $query->num_rows();
+        if($check > 0){
+            // Get prev user data
+            $result = $query->row_array();
+            
+            // Update user data
+            $data['modified'] = date("Y-m-d H:i:s");
+            $update = $this->db->update("google", $data, array('id' => $result['id']));
+            
+            // Get user ID
+            $userID = $result['id'];
+        }else{
+            // Insert user data
+            $data['created'] = date("Y-m-d H:i:s");
+            $data['modified'] = date("Y-m-d H:i:s");
+            $insert = $this->db->insert("google", $data);
+            
+            // Get user ID
+            $userID = $this->db->insert_id();
+        }
+        
+        // Return user ID
+        return $userID?$userID:false;
+    }
 
 }
