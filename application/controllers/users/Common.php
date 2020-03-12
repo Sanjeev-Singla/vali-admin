@@ -8,19 +8,17 @@ class Common extends MY_Controller {
 		parent::__construct();
 		$this->load->model('global_model');
 		date_default_timezone_set('Asia/Calcutta'); 
-        //session_destroy();
-		/*if($this->_is_logged_in('admin_id')){
+		if($this->_is_logged_in('admin_id')){
             _redirect('admin_home');
-        }*/
+        }
 	}
 
 # User Registration
 	public function user_register(){
 		if ($data = $this->input->post()) {
             $data['ip'] = $this->input->ip_address();
-			$this->form_validation->set_rules($this->register_form_validate());
 			$this->form_validation->set_error_delimiters("<p class='text-danger'>","</p>");
-			if ($this->form_validation->run() == FALSE) {
+			if ($this->form_validation->run('user_signup') == FALSE) {
 				$this->load->view('public/form_common/header');
 				$this->load->view('public/register');
 				$this->load->view('public/form_common/footer');
@@ -43,63 +41,11 @@ class Common extends MY_Controller {
 		}
 	}
 
-# Register Form Validations
-    public function register_form_validate() {
-        $config = array(
-            array(
-                'field' => 'name',
-                'rules' => 'required|alpha_dash_space',
-                'errors' => array(
-                    'required' => 'Please enter your %s.',
-                ),
-            ),
-            array(
-                'field' => 'phone',
-                'rules' => 'required|is_natural|is_unique[users.phone]',
-                'errors' => array(
-                    'required' => 'Please enter your %s.',
-                ),
-            ),
-            array(
-                'field' => 'password',
-                'rules' => 'required',
-                'errors' => array(
-                    'required' => 'Please enter your %s.',
-                ),
-            ),
-            array(
-                'field' => 'confirm_password',
-                'rules' => 'required|matches[password]',
-                'errors' => array(
-                    'required' => 'Please enter your %s.'
-                )
-            ),
-            array(
-                'field' => 'gender',
-                'rules' => 'required|alpha',
-                'errors' => array(
-                    'required' => 'Please enter your %s.',
-                ),
-            ),
-            array(
-                'field' => 'email',
-                'rules' => 'required|valid_email|is_unique[users.email]',
-                'errors' => array(
-                    'required' => 'Please enter your %s.',
-                    'valid_email' => 'Please enter valid %s.',
-                    'is_unique' => 'This email id already register with different account.'
-                )
-            )
-        );
-        return $config;
-    }
-
 # User Login
     public function user_login(){
         if ($data = $this->input->post()) {
-            $this->form_validation->set_rules($this->login_form_validate());
             $this->form_validation->set_error_delimiters("<p class='text-danger'>","</p>");
-            if ($this->form_validation->run() == FALSE) {
+            if ($this->form_validation->run('user_signin') == FALSE) {
                 $this->load->view('public/form_common/header');
                 $this->load->view('public/login');
                 $this->load->view('public/form_common/footer');
@@ -128,28 +74,6 @@ class Common extends MY_Controller {
         }
     }
 
-# Login Form Validation
-    public function login_form_validate() {
-        $config = array(
-            
-            array(
-                'field' => 'password',
-                'rules' => 'required',
-                'errors' => array(
-                    'required' => 'Please enter your %s.',
-                ),
-            ),
-            array(
-                'field' => 'email',
-                'rules' => 'required|valid_email',
-                'errors' => array(
-                    'required' => 'Please enter your %s.',
-                    'valid_email' => 'Please enter valid %s.',
-                )
-            )
-        );
-        return $config;
-    }
 
 # Forgot Password sending email for varification with token key
     public function forgot(){
@@ -203,9 +127,8 @@ class Common extends MY_Controller {
 # Resetting the password
     public function reset_password_update() {
         if ($data = $this->input->post()) {
-            $this->form_validation->set_rules($this->reset_password_form_validation());
             $this->form_validation->set_error_delimiters("<p class='text-danger'>","</p>");
-            if ($this->form_validation->run() == FALSE) {
+            if ($this->form_validation->run('user_update_password') == FALSE) {
                 _redirect('reset-forgot-password');
             }else{
                 $where['email'] = $this->session->userdata('forgot_email');
@@ -225,26 +148,5 @@ class Common extends MY_Controller {
         }else{
             _redirect('reset-forgot-password');
         }
-    }
-
-# Reset Password form validations
-    public function reset_password_form_validation() {
-        $config = array(
-            array(
-                    'field' => 'password',
-                    'rules' => 'required',
-                    'errors' => array(
-                        'required' => 'Please enter your %s.',
-                    ),
-                ),
-                array(
-                    'field' => 'confirm_password',
-                    'rules' => 'required|matches[password]',
-                    'errors' => array(
-                        'required' => 'Please enter your %s.'
-                    ),
-                )
-            );
-        return $config;
     }
 }
