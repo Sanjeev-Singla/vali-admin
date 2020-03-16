@@ -22,3 +22,4 @@ $config = [
 		            $file_name = $file_data['raw_name'] . $file_data['file_ext'];
 		            $data['printing_prior'] = $file_name; // making file path+name
 		        }
+https://phppot.com/php/php-ajax-image-upload/
